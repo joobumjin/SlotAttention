@@ -1,6 +1,5 @@
 from absl import logging
 import tensorflow as tf
-import tensorflow_datasets as tfds
 import matplotlib.pyplot as plt
 import collections
 import numpy as np
@@ -77,7 +76,7 @@ def main():
   decay_rate = 0.5
   decay_steps = 100000
   tf.random.set_seed(0)
-  resolution = (128, 128)
+  resolution = (256, 256)
 
   # Build dataset iterators, optimizers and model.
   data_iterator = build_clevr_iterator(
