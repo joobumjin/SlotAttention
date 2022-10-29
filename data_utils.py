@@ -24,7 +24,10 @@ def fetch_data():
   return None
 
 
-def allen_cell_dataset(batch_size = 64):
+def allen_cell_dataset(download_data = False, batch_size = 64): #maybe include train, validation, and test splits?
+  if download_data:
+    fetch_data()
+
   def convert_to_padded_tensor(img):
       image_tensor = tf.convert_to_tensor(img.data[0][0])
       padded_tensor = tf.image.resize_with_crop_or_pad(image_tensor, 256, 256)

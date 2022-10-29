@@ -79,9 +79,7 @@ def main():
   resolution = (256, 256)
 
   # Build dataset iterators, optimizers and model.
-  data_iterator = build_clevr_iterator(
-      batch_size, split="train", resolution=resolution, shuffle=True,
-      max_n_objects=6, get_properties=False, apply_crop=True)
+  data_iterator = allen_cell_dataset(False, batch_size)
 
   optimizer = tf.keras.optimizers.Adam(base_learning_rate, epsilon=1e-08)
 
@@ -117,11 +115,7 @@ def main():
 
   visualize_loss(losses)
 
-  batch_size = 64
-  resolution = (128,128)
-  data_iterator = build_clevr_iterator(
-      batch_size, split="validation", resolution=resolution, shuffle=True,
-      max_n_objects=6, get_properties=False, apply_crop=True)
+  data_iterator = allen_cell_dataset(False, batch_size)
 
   batch = next(data_iterator)
 
