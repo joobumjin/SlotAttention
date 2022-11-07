@@ -75,11 +75,15 @@ def main():
   warmup_steps = 5
   decay_rate = 0.5
   decay_steps = 100000
-  tf.random.set_seed(0)
+  #tf.random.set_seed(0)
   resolution = (256, 256)
 
+  #checkpoint_path = "./training/cp.ckpt"
+  #checkpoint_dir = os.path.dirname(checkpoint_path)
+
+
   # Build dataset iterators, optimizers and model.
-  data_iterator = allen_cell_dataset(False, batch_size)
+  train_iterator, test_iterator, val_iterator = allen_cell_dataset(False, batch_size)
 
   optimizer = tf.keras.optimizers.Adam(base_learning_rate, epsilon=1e-08)
 
@@ -93,7 +97,7 @@ def main():
   losses = []
 
   for _ in tqdm(range(num_train_steps), desc='Training Epochs'):
-      batch = next(data_iterator)
+      batch = next(train_iterator)
 
       # Learning rate warm-up.
       if global_step < warmup_steps:
@@ -115,9 +119,7 @@ def main():
 
   visualize_loss(losses)
 
-  data_iterator = allen_cell_dataset(False, batch_size)
-
-  batch = next(data_iterator)
+  batch = next(test_iterator)
 
   image, recon_combined, recons, masks, slots = get_prediction(model, batch)
 

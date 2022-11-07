@@ -24,7 +24,10 @@ def fetch_data():
   return None
 
 
-def allen_cell_dataset(download_data = False, batch_size = 64): #maybe include train, validation, and test splits?
+def allen_cell_dataset(download_data = False, batch_size = 64):
+  # 70 train: 35k 
+  # 20 validation: 10k
+  # 10 test: 5k
   if download_data:
     fetch_data()
 
@@ -41,12 +44,24 @@ def allen_cell_dataset(download_data = False, batch_size = 64): #maybe include t
     raise Exception("No .png Files in the AllenCell directory.")
 
   for file_name in file_names:
-          img = AICSImage(file_name)
+    img = AICSImage(file_name)
 
-          tensor = convert_to_padded_tensor(img)
-          imgs.append(tensor[0])
+    tensor = convert_to_padded_tensor(img)
+    imgs.append(tensor[0])
 
+  ## split into train validation test
 
   dataset = tf.data.Dataset.from_tensor_slices(imgs)
 
-  return dataset
+  dataset = dataset.shuffle()
+
+  test_val = dataset.take(15000)
+  train = dataset.skip(150000)
+  train = train.batch(batch_size)
+
+  test = test_val.take(5000)
+  test = test.batch(batch_size)
+  val = test_val.take(10000)
+  val = val.batch(batch_size)
+
+  return train, test, val
