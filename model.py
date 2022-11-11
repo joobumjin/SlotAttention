@@ -8,7 +8,7 @@ from tqdm import tqdm
 import slot_layers
 
 def build_model(resolution, batch_size, num_slots, num_iterations,
-                num_channels=3, model_type="object_discovery"):
+                num_channels=3):
   """Build keras model."""
 
   encoder_cnn = tf.keras.Sequential([
@@ -71,5 +71,5 @@ def build_model(resolution, batch_size, num_slots, num_iterations,
   outputs = recon_combined, recons, masks, slots
 
   slot_attention_ae = tf.keras.Model(inputs = inputs, outputs = outputs, name="Slot_Attention_AutoEnconder")
-  slot_attention_ae.summary()
+  #slot_attention_ae.summary()
   return slot_attention_ae  

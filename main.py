@@ -84,11 +84,13 @@ def main():
 
   # Build dataset iterators, optimizers and model.
   train_iterator, test_iterator, val_iterator = allen_cell_dataset(False, batch_size)
+  train_iterator = cycle(list(train_iterator))
+  test_iterator = cycle(list(test_iterator))
+  val_iterator = cycle(list(val_iterator))
 
   optimizer = tf.keras.optimizers.Adam(base_learning_rate, epsilon=1e-08)
 
-  model = build_model(resolution, batch_size, num_slots,
-                      num_iterations, model_type="object_discovery")
+  model = build_model(resolution, batch_size, num_slots, num_iterations)
     
   # Prepare checkpoint manager.
   global_step = tf.Variable(
@@ -98,20 +100,21 @@ def main():
 
   for _ in tqdm(range(num_train_steps), desc='Training Epochs'):
       batch = next(train_iterator)
+      val_batch = next(val_iterator)
 
       # Learning rate warm-up.
       if global_step < warmup_steps:
-        learning_rate = base_learning_rate * tf.cast(
-            global_step, tf.float32) / tf.cast(warmup_steps, tf.float32)
+          learning_rate = base_learning_rate * tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32)
       else:
-        learning_rate = base_learning_rate
-      
-      learning_rate = learning_rate * (decay_rate ** (
-          tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
+          learning_rate = base_learning_rate
+
+      learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
       optimizer.lr = learning_rate.numpy()
 
-      loss_value = train_step(batch, model, optimizer)
+      loss_value = train_step(batch, slot_attention_ae, optimizer)
       losses.append(loss_value)
+      
+      val_losses.append(slot_attention_ae(batch, training=False))
 
       # Update the global step. We update it before logging the loss and saving
       # the model so that the last checkpoint is saved at the last iteration.
