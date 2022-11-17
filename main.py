@@ -3,10 +3,10 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import collections
 import numpy as np
-import tensorflow.keras.layers as layers
 from tqdm import tqdm
 from data_utils import *
 from model import *
+from itertools import cycle
 
 """Training loop for object discovery with Slot Attention."""
 
@@ -36,22 +36,21 @@ def train_step(batch, model, optimizer):
   return loss_value
 
 
-def visualize_loss(losses): 
-  """
-  Uses Matplotlib to visualize the losses of our model.
-  :param losses: list of loss data stored from train. Can use the model's loss_list 
-  field 
-
-  NOTE: DO NOT EDIT
-
-  :return: doesn't return anything, a plot should pop-up 
-  """
+def visualize_loss(losses):
   x = [i for i in range(len(losses))]
   plt.plot(x, losses)
   plt.title('Loss per epoch')
   plt.xlabel('Training Epoch')
   plt.ylabel('Loss')
   plt.show()
+
+def save_loss(losses, file_name):
+  x = [i for i in range(len(losses))]
+  plt.plot(x, losses)
+  plt.title('Loss per epoch')
+  plt.xlabel('Training Epoch')
+  plt.ylabel('Loss')
+  plt.savefig(file_name)
 
 def renormalize(x):
   """Renormalize from [-1, 1] to [0, 1]."""
@@ -67,20 +66,18 @@ def get_prediction(model, batch, idx=0):
 
 def main():
   # Hyperparameters of the model.
-  batch_size = 64
+  batch_size = 8
   num_slots = 7
   num_iterations = 3
   base_learning_rate = 0.0004
   num_train_steps = 100
-  warmup_steps = 5
+  warmup_steps = 40
   decay_rate = 0.5
   decay_steps = 100000
   #tf.random.set_seed(0)
   resolution = (256, 256)
 
-  #checkpoint_path = "./training/cp.ckpt"
-  #checkpoint_dir = os.path.dirname(checkpoint_path)
-
+  checkpoint_path = "./training/cp-{epoch}.ckpt"
 
   # Build dataset iterators, optimizers and model.
   train_iterator, test_iterator, val_iterator = allen_cell_dataset(False, batch_size)
@@ -111,17 +108,23 @@ def main():
       learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
       optimizer.lr = learning_rate.numpy()
 
-      loss_value = train_step(batch, slot_attention_ae, optimizer)
+      loss_value = train_step(batch, model, optimizer)
       losses.append(loss_value)
       
-      val_losses.append(slot_attention_ae(batch, training=False))
+      val_recon_combined, _, _, _ = model(val_batch, training=False)
+      val_losses.append(l2_loss(val_recon_combined, val_batch))
 
       # Update the global step. We update it before logging the loss and saving
       # the model so that the last checkpoint is saved at the last iteration.
       global_step.assign_add(1)
 
-  visualize_loss(losses)
+  model.save_weights(checkpoint_path.format(epoch=num_train_steps))
+  model.save_loss(losses, "training_loss.png")
+  model.save_loss(val_losses, "validation_loss.png")
 
+  #visualize_loss(losses)
+
+  """
   batch = next(test_iterator)
 
   image, recon_combined, recons, masks, slots = get_prediction(model, batch)
@@ -139,6 +142,8 @@ def main():
   for i in range(len(ax)):
     ax[i].grid(False)
     ax[i].axis('off')
+
+  """
 
 if __name__ == main():
   main()
