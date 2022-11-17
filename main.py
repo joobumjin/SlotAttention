@@ -1,4 +1,3 @@
-from absl import logging
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import collections
