@@ -9,6 +9,9 @@
 # Load a CUDA module
 module load cuda
 module load miniconda/4.12.0
+
+conda init bash
+
 conda activate SlotAttention
 conda list tensorflow
 which python
