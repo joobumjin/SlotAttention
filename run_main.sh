@@ -10,8 +10,7 @@
 module load cuda
 module load miniconda/4.12.0
 conda activate SlotAttention
-conda list python 
-which python
+conda list tensorflow
 
 # Run program
 cd /users/bjoo2/data/bjoo2/SlotAttention/SlotAttention
