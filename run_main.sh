@@ -14,4 +14,4 @@ conda list tensorflow
 
 # Run program
 cd /users/bjoo2/data/bjoo2/SlotAttention/SlotAttention
-python main.py
+python3 main.py
