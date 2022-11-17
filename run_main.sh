@@ -15,4 +15,4 @@ which python
 
 # Run program
 cd /users/bjoo2/data/bjoo2/SlotAttention/SlotAttention
-./main.py
+python main.py
