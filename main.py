@@ -96,27 +96,28 @@ def main():
   losses = []
 
   for _ in tqdm(range(num_train_steps), desc='Training Epochs'):
-      batch = next(train_iterator)
-      val_batch = next(val_iterator)
+    batch = next(train_iterator)
+    val_batch = next(val_iterator)
 
-      # Learning rate warm-up.
-      if global_step < warmup_steps:
-          learning_rate = base_learning_rate * tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32)
-      else:
-          learning_rate = base_learning_rate
 
-      learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
-      optimizer.lr = learning_rate.numpy()
+    # Learning rate warm-up.
+    if global_step < warmup_steps:
+        learning_rate = base_learning_rate * tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32)
+    else:
+        learning_rate = base_learning_rate
 
-      loss_value = train_step(batch, model, optimizer)
-      losses.append(loss_value)
+    learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
+    optimizer.lr = learning_rate.numpy()
+
+    loss_value = train_step(batch, model, optimizer)
+    losses.append(loss_value)
       
-      val_recon_combined, _, _, _ = model(val_batch, training=False)
-      val_losses.append(l2_loss(val_recon_combined, val_batch))
+    val_recon_combined, _, _, _ = model(val_batch, training=False)
+    val_losses.append(l2_loss(val_recon_combined, val_batch))
 
-      # Update the global step. We update it before logging the loss and saving
-      # the model so that the last checkpoint is saved at the last iteration.
-      global_step.assign_add(1)
+    # Update the global step. We update it before logging the loss and saving
+    # the model so that the last checkpoint is saved at the last iteration.
+    global_step.assign_add(1)
 
   model.save_weights(checkpoint_path.format(epoch=num_train_steps))
   model.save_loss(losses, f"training_loss_{num_train_steps}.png")
