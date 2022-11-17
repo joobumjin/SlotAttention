@@ -6,6 +6,7 @@
 # Request 1 CPU core
 #SBATCH -n 4
 #SBATCH -t 04:00:00
+#SBATCH -m 128g
 
 # Load a CUDA module
 module load cuda
