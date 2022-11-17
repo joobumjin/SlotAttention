@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Request a GPU partition node and access to 1 GPU
-#SBATCH -p gpu --gres=gpu:2
+#SBATCH -q gpu -g 2
 
 # Request 1 CPU core
 #SBATCH -n 4
