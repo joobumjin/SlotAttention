@@ -119,8 +119,8 @@ def main():
       global_step.assign_add(1)
 
   model.save_weights(checkpoint_path.format(epoch=num_train_steps))
-  model.save_loss(losses, "training_loss.png")
-  model.save_loss(val_losses, "validation_loss.png")
+  model.save_loss(losses, f"training_loss_{num_train_steps}.png")
+  model.save_loss(val_losses, f"validation_loss_{num_train_steps}.png")
 
   #visualize_loss(losses)
 
