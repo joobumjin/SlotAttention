@@ -23,9 +23,9 @@ def train_step(batch, model, optimizer):
 
   # Get the prediction of the models and compute the loss.
   with tf.GradientTape() as tape:
-    preds = model(batch["image"], training=True)
+    preds = model(batch, training=True)
     recon_combined, recons, masks, slots = preds
-    loss_value = l2_loss(recon_combined, batch["image"])
+    loss_value = l2_loss(recon_combined, batch)
     del recons, masks, slots  # Unused.
 
   # Get and apply gradients.
