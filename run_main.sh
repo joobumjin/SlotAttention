@@ -14,8 +14,6 @@ source /gpfs/runtime/opt/miniconda/4.12.0/etc/profile.d/conda.sh
 conda init bash
 
 conda activate SlotAttention
-conda list tensorflow
-which python
 
 # Run program
 cd /users/bjoo2/data/bjoo2/SlotAttention/SlotAttention
