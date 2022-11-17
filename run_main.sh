@@ -9,6 +9,7 @@
 # Load a CUDA module
 module load cuda
 module load miniconda/4.12.0
+source /gpfs/runtime/opt/miniconda/4.12.0/etc/profile.d/conda.sh
 
 conda init bash
 
