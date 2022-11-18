@@ -93,6 +93,7 @@ def main():
       0, trainable=False, name="global_step", dtype=tf.int64)
 
   losses = []
+  val_losses = []
 
   for _ in tqdm(range(num_train_steps), desc='Training Epochs'):
     batch = next(train_iterator)
