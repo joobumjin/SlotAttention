@@ -4,14 +4,12 @@
 
 #SBATCH -n 4
 #SBATCH -t 07:00:00
-#SBATCH --mem=128g
+#SBATCH --mem=150g
 
 # Load a CUDA module
 module load cuda
 module load miniconda/4.12.0
 source /gpfs/runtime/opt/miniconda/4.12.0/etc/profile.d/conda.sh
-
-conda init bash
 
 conda activate SlotAttention
 
