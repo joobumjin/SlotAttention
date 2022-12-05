@@ -77,8 +77,7 @@ def main():
   model = build_model(resolution, batch_size, num_slots, num_iterations)
     
   # Prepare checkpoint manager.
-  global_step = tf.Variable(
-      0, trainable=False, name="global_step", dtype=tf.int64)
+  global_step = tf.Variable(0, trainable=False, name="global_step", dtype=tf.int64)
 
   losses = []
   val_losses = []
