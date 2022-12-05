@@ -51,25 +51,13 @@ def save_loss(losses, file_name):
   plt.ylabel('Loss')
   plt.savefig(file_name)
 
-def renormalize(x):
-  """Renormalize from [-1, 1] to [0, 1]."""
-  return x / 2. + 0.5
-
-def get_prediction(model, batch, idx=0):
-  recon_combined, recons, masks, slots = model(batch["image"])
-  image = renormalize(batch["image"])[idx]
-  recon_combined = renormalize(recon_combined)[idx]
-  recons = renormalize(recons)[idx]
-  masks = masks[idx]
-  return image, recon_combined, recons, masks, slots
-
 def main():
   # Hyperparameters of the model.
   batch_size = 8
   num_slots = 7
   num_iterations = 6
   base_learning_rate = 0.0004
-  num_train_steps = 1000
+  num_train_steps = 2000
   warmup_steps = 40
   decay_rate = 0.5
   decay_steps = 100000
@@ -122,29 +110,6 @@ def main():
   model.save_weights(checkpoint_path.format(epoch=num_train_steps))
   save_loss(losses, f"training_loss_{num_train_steps}.png")
   save_loss(val_losses, f"validation_loss_{num_train_steps}.png")
-
-  #visualize_loss(losses)
-
-  """
-  batch = next(test_iterator)
-
-  image, recon_combined, recons, masks, slots = get_prediction(model, batch)
-
-  # Visualize.
-  num_slots = len(masks)
-  fig, ax = plt.subplots(1, num_slots + 2, figsize=(15, 2))
-  ax[0].imshow(image)
-  ax[0].set_title('Image')
-  ax[1].imshow(recon_combined)
-  ax[1].set_title('Recon.')
-  for i in range(num_slots):
-    ax[i + 2].imshow(recons[i] * masks[i] + (1 - masks[i]))
-    ax[i + 2].set_title('Slot %s' % str(i + 1))
-  for i in range(len(ax)):
-    ax[i].grid(False)
-    ax[i].axis('off')
-
-  """
 
 if __name__ == main():
   main()
