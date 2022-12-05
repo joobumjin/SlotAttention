@@ -34,9 +34,9 @@ def allen_cell_dataset(download_data = False, batch_size = 64):
         
     def convert_to_padded_tensor(img):
         image_tensor = tf.convert_to_tensor(img.data[0][0], dtype=tf.float32)
-        padded_tensor = tf.image.resize_with_crop_or_pad(image_tensor, 256, 256)
-        return padded_tensor
-    
+        image_tensor = image_tensor / 255.0
+        image_tensor = tf.image.resize_with_crop_or_pad(image_tensor, 256, 256)
+        return image_tensor
     
     imgs = []
     file_names = [join("./AllenCell/cell_images_2d/", f) for f in listdir("./AllenCell/cell_images_2d/") if join("./AllenCell/cell_images_2d/", f).endswith(".png")]
