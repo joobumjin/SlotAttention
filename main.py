@@ -39,7 +39,7 @@ def visualize_loss(losses):
   x = [i for i in range(len(losses))]
   plt.plot(x, losses)
   plt.title('Loss per epoch')
-  plt.xlabel('Training Epoch')
+  plt.xlabel('Training Step')
   plt.ylabel('Loss')
   plt.show()
 
@@ -47,7 +47,7 @@ def save_loss(losses, file_name):
   x = [i for i in range(len(losses))]
   plt.plot(x, losses)
   plt.title('Loss per epoch')
-  plt.xlabel('Training Epoch')
+  plt.xlabel('Training Step')
   plt.ylabel('Loss')
   plt.savefig(file_name)
 
@@ -55,9 +55,9 @@ def main():
   # Hyperparameters of the model.
   batch_size = 8
   num_slots = 7
-  num_iterations = 6
+  num_iterations = 7
   base_learning_rate = 0.0004
-  num_train_steps = 2000
+  num_train_steps = 200
   warmup_steps = 40
   decay_rate = 0.5
   decay_steps = 100000
