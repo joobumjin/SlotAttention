@@ -60,13 +60,13 @@ def allen_cell_dataset(download_data = False, batch_size = 64):
     num_test = math.floor(num_sample * 0.1)
     
     train = dataset.take(num_train)
-    train = train.batch(batch_size)
+    train = train.batch(batch_size, drop_remainder=True)
     test_val = dataset.skip(num_train)
     
     test = test_val.take(num_test)
-    test = test.batch(batch_size)
+    test = test.batch(batch_size, drop_remainder=True)
     
     val = test_val.skip(num_test)
-    val = val.batch(batch_size)
+    val = val.batch(batch_size, drop_remainder=True)
 
     return train, test, val
