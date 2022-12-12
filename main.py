@@ -58,7 +58,7 @@ def main():
   num_iterations = 7
   base_learning_rate = 0.0004
   num_train_steps = 500
-  #warmup_steps = 40
+  warmup_steps = 40
   #decay_rate = 0.5
   #decay_steps = 100000
   #tf.random.set_seed(0)
