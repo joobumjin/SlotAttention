@@ -55,12 +55,12 @@ def main():
   # Hyperparameters of the model.
   batch_size = 8
   num_slots = 7
-  num_iterations = 7
+  num_iterations = 3
   base_learning_rate = 0.0004
   num_train_steps = 500
-  warmup_steps = 40
-  #decay_rate = 0.5
-  #decay_steps = 100000
+  warmup_steps = 5
+  decay_rate = 0.5
+  decay_steps = 100000
   #tf.random.set_seed(0)
   resolution = (256, 256)
 
@@ -93,8 +93,8 @@ def main():
     else:
         learning_rate = base_learning_rate
 
-    #learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
-    #optimizer.lr = learning_rate.numpy()
+    learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
+    optimizer.lr = learning_rate.numpy()
 
     loss_value = train_step(batch, model, optimizer)
     losses.append(loss_value)
