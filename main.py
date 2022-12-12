@@ -55,9 +55,9 @@ def main():
   # Hyperparameters of the model.
   batch_size = 8
   num_slots = 7
-  num_iterations = 3
+  num_iterations = 5
   base_learning_rate = 0.0004
-  num_train_steps = 500
+  num_train_steps = 1000
   warmup_steps = 5
   decay_rate = 0.5
   decay_steps = 100000
