@@ -7,6 +7,75 @@ from tqdm import tqdm
 
 import slot_layers
 
+class SlotAttentionAE(tf.keras.Model):
+  def __init__(self, resolution, batch_size, num_slots, num_iterations, num_channels=3, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+
+    self.resolution = resolution
+    self.batch_size = batch_size
+    self.num_slots = num_slots
+    self.num_channels = num_channels
+
+    self.encoder_cnn = tf.keras.Sequential([
+      tf.keras.layers.Conv2D(64, kernel_size=5, padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2D(64, kernel_size=5, padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2D(64, kernel_size=5, padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2D(64, kernel_size=5, padding="SAME", activation="relu")
+    ], name="encoder_cnn")
+
+    self.decoder_initial_size = (8, 8)
+    self.decoder_cnn = tf.keras.Sequential([
+      tf.keras.layers.Conv2DTranspose(64, 5, strides=(2, 2), padding="SAME", activation="relu"),  
+      tf.keras.layers.Conv2DTranspose(64, 5, strides=(2, 2), padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2DTranspose(64, 5, strides=(2, 2), padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2DTranspose(64, 5, strides=(2, 2), padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2DTranspose(64, 5, strides=(2, 2), padding="SAME", activation="relu"),
+      tf.keras.layers.Conv2DTranspose(4, 3, strides=(1, 1), padding="SAME", activation=None)
+    ], name="decoder_cnn")
+
+    self.encoder_pos = slot_layers.SoftPositionEmbed(64, self.resolution)
+    self.decoder_pos = slot_layers.SoftPositionEmbed(64, self.decoder_initial_size)
+
+    self.layer_norm = tf.keras.layers.LayerNormalization()
+    self.mlp = tf.keras.Sequential([
+      tf.keras.layers.Dense(64, activation="relu"),
+      tf.keras.layers.Dense(64)
+    ], name="encoded_feedforward")
+
+    self.slot_attention = slot_layers.SlotAttention(num_iterations=num_iterations, num_slots=num_slots, slot_size=64, mlp_hidden_size=128)
+
+  def call(self, inputs):
+    x = self.encoder_cnn(inputs)  # CNN Backbone.
+    x = self.encoder_pos(x)  # Add positional embeddings to x
+    x = slot_layers.spatial_flatten(x)  # Flatten spatial dimensions (treat image as set).
+    x = self.mlp(self.layer_norm(x))  # Feedforward network on set.
+    # `x` has shape: [batch_size, width*height, input_size(64)].
+
+    # Slot Attention module.
+    slots = self.slot_attention(x)
+    # `slots` has shape: [batch_size, num_slots, slot_size].
+
+    # Spatial broadcast decoder.
+    x = slot_layers.spatial_broadcast(slots, self.decoder_initial_size)
+    # `x` has shape: [batch_size*num_slots, width_init, height_init, slot_size].
+    x = self.decoder_pos(x)
+    x = self.decoder_cnn(x)
+    # `x` has shape: [batch_size*num_slots, width, height, num_channels+1].
+
+    # Undo combination of slot and batch dimension; split alpha masks.
+    recons, masks = slot_layers.unstack_and_split(x, batch_size=self.batch_size)
+    # `recons` has shape: [batch_size, num_slots, width, height, num_channels].
+    # `masks` has shape: [batch_size, num_slots, width, height, 1].
+
+    # Normalize alpha masks over slots.
+    masks = tf.nn.softmax(masks, axis=1)
+    recon_combined = tf.reduce_sum(recons * masks, axis=1)  # Recombine image.
+    # `recon_combined` has shape: [batch_size, width, height, num_channels].
+
+    outputs = recon_combined, recons, masks, slots
+
+    return outputs
+
 def build_model(resolution, batch_size, num_slots, num_iterations, num_channels=3):
   """Build keras model."""
 
@@ -69,6 +138,6 @@ def build_model(resolution, batch_size, num_slots, num_iterations, num_channels=
 
   outputs = recon_combined, recons, masks, slots
 
-  model = tf.keras.Model(inputs = inputs, outputs = outputs, name="Slot_Attention_AutoEnconder")
+  model = tf.keras.Model(inputs = inputs, outputs = outputs, name="Slot_Attention_AutoEncoder")
 
   return model  
