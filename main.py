@@ -55,7 +55,7 @@ def main():
   # Hyperparameters of the model.
   batch_size = 8
   num_slots = 7
-  num_iterations = 5
+  num_iterations = 3
   base_learning_rate = 0.0004
   num_train_steps = 1000
   warmup_steps = 5
@@ -64,7 +64,7 @@ def main():
   #tf.random.set_seed(0)
   resolution = (256, 256)
 
-  checkpoint_path = "./training/cp-{epoch}.ckpt"
+  checkpoint_path = "./training/cp-{epoch}-{num_iterations}.ckpt"
 
   # Build dataset iterators, optimizers and model.
   train_iterator, test_iterator, val_iterator = allen_cell_dataset(False, batch_size)
