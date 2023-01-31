@@ -64,7 +64,7 @@ def main():
   #tf.random.set_seed(0)
   resolution = (256, 256)
 
-  checkpoint_path = f"./training/{num_train_steps}epochs/{its}iters/checkpoint.ckpt"
+  checkpoint_path = f"./training/{num_train_steps}epochs/{num_iterations}iters/checkpoint.ckpt"
 
   # Build dataset iterators, optimizers and model.
   train_iterator, test_iterator, val_iterator = allen_cell_dataset(False, batch_size)
