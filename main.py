@@ -64,7 +64,7 @@ def main():
   #tf.random.set_seed(0)
   resolution = (256, 256)
 
-  checkpoint_path = "./training/{epochs}epochs/{its}iters/checkpoint.ckpt"
+  checkpoint_path = f"./training/{num_train_steps}epochs/{its}iters/checkpoint.ckpt"
 
   # Build dataset iterators, optimizers and model.
   train_iterator, test_iterator, val_iterator = allen_cell_dataset(False, batch_size)
@@ -106,7 +106,7 @@ def main():
     # the model so that the last checkpoint is saved at the last iteration.
     global_step.assign_add(1)
 
-  model.save_weights(checkpoint_path.format(epoch=num_train_steps, its=num_iterations))
+  model.save_weights(checkpoint_path)
   save_loss(losses, f"losses/{num_train_steps}epochs/{num_iterations}iters/training_loss.png")
   save_loss(val_losses, f"losses/{num_train_steps}epochs/{num_iterations}iters/validation_loss.png")
 
