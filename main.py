@@ -53,11 +53,11 @@ def save_loss(losses, file_name):
 
 def main():
   # Hyperparameters of the model.
-  batch_size = 8
+  batch_size = 16
   num_slots = 7
   num_iterations = 3
   base_learning_rate = 0.0004
-  num_train_steps = 1000
+  num_train_steps = 10000
   warmup_steps = 5
   decay_rate = 0.5
   decay_steps = 100000
@@ -82,19 +82,19 @@ def main():
   losses = []
   val_losses = []
 
-  for _ in tqdm(range(num_train_steps), desc='Training Epochs'):
+  for cur_step in tqdm(range(num_train_steps), desc='Training Epochs'):
     batch = next(train_iterator)
     val_batch = next(val_iterator)
 
 
     # Learning rate warm-up.
-    if global_step < warmup_steps:
-        learning_rate = base_learning_rate * tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32)
-    else:
-        learning_rate = base_learning_rate
+    # if global_step < warmup_steps:
+    #     learning_rate = base_learning_rate * tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32)
+    # else:
+    #     learning_rate = base_learning_rate
 
-    learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
-    optimizer.lr = learning_rate.numpy()
+    #learning_rate = learning_rate * (decay_rate ** (tf.cast(global_step, tf.float32) / tf.cast(decay_steps, tf.float32)))
+    #optimizer.lr = learning_rate.numpy()
 
     loss_value = train_step(batch, model, optimizer)
     losses.append(loss_value)
@@ -104,7 +104,12 @@ def main():
 
     # Update the global step. We update it before logging the loss and saving
     # the model so that the last checkpoint is saved at the last iteration.
-    global_step.assign_add(1)
+    #global_step.assign_add(1)
+
+
+    if cur_step % 1000 == 0:
+
+      model.save_weights(f"./training/{num_train_steps}epochs/{num_iterations}iters/intermed/{cur_step}/checkpoint.ckpt")
 
   model.save_weights(checkpoint_path)
   save_loss(losses, f"losses/{num_train_steps}epochs/{num_iterations}iters/training_loss.png")
