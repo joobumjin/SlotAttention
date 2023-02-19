@@ -3,7 +3,7 @@
 #SBATCH --partition=gpu --gres=gpu:2
 
 #SBATCH -n 4
-#SBATCH -t 20:00:00
+#SBATCH -t 48:00:00
 #SBATCH --mem=150g
 
 # Load a CUDA module
